@@ -128,4 +128,4 @@ ai-coworker-engine/
 
 ---
 
-*Built by [Your Name] — AI Engineer Intern application, Edtronaut*
+*Built by Ton Anh Truc — AI Engineer Intern application, Edtronaut*
