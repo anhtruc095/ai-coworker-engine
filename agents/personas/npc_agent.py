@@ -9,13 +9,15 @@ Usage:
 """
 
 import os
-import json
 import time
 from typing import Optional
-from anthropic import Anthropic
+from openai import OpenAI
+from dotenv import load_dotenv
 from agents.personas.chro import CHRO_PERSONA
 from agents.personas.ceo import CEO_PERSONA
 from agents.personas.regional_mgr import REGIONAL_MGR_PERSONA
+
+load_dotenv()
 
 # Map persona_id → persona config
 PERSONA_REGISTRY = {
@@ -24,7 +26,15 @@ PERSONA_REGISTRY = {
     "regional_mgr": REGIONAL_MGR_PERSONA,
 }
 
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+
+
+def get_client() -> OpenAI:
+    if not os.environ.get("OPENAI_API_KEY"):
+        raise RuntimeError(
+            "OPENAI_API_KEY is not set. Add it to .env or export it before starting the server."
+        )
+    return OpenAI()
 
 
 class NPCAgent:
@@ -92,14 +102,16 @@ class NPCAgent:
         system_prompt = self._build_system_prompt()
 
         # 4. Call LLM (streaming disabled for simplicity — enable in production)
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+        response = get_client().chat.completions.create(
+            model=OPENAI_MODEL,
             max_tokens=1000,
-            system=system_prompt,
-            messages=self.history,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                *self.history,
+            ],
         )
 
-        assistant_message = response.content[0].text
+        assistant_message = response.choices[0].message.content or ""
 
         # 5. Append assistant reply to history
         self.history.append({"role": "assistant", "content": assistant_message})

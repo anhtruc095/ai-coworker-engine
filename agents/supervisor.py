@@ -4,9 +4,20 @@ Invisible to the user. Monitors the conversation and keeps the simulation on tra
 """
 
 import os
-from anthropic import Anthropic
+from openai import OpenAI
+from dotenv import load_dotenv
 
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+load_dotenv()
+
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+
+
+def get_client() -> OpenAI:
+    if not os.environ.get("OPENAI_API_KEY"):
+        raise RuntimeError(
+            "OPENAI_API_KEY is not set. Add it to .env or export it before starting the server."
+        )
+    return OpenAI()
 
 
 class SupervisorAgent:
@@ -140,12 +151,12 @@ class SupervisorAgent:
         )
 
         try:
-            response = client.messages.create(
-                model="claude-haiku-4-5-20251001",  # cheap + fast for this check
+            response = get_client().chat.completions.create(
+                model=OPENAI_MODEL,
                 max_tokens=10,
                 messages=[{"role": "user", "content": prompt}],
             )
-            score_text = response.content[0].text.strip()
+            score_text = (response.choices[0].message.content or "").strip()
             return int("".join(filter(str.isdigit, score_text)) or "50")
         except Exception:
             return 50  # default if call fails

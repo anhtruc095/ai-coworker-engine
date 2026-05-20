@@ -148,16 +148,16 @@ def test_all_personas_load():
 
 
 # -----------------------------------------------------------------------
-# Integration demo (requires ANTHROPIC_API_KEY)
+# Integration demo (requires OPENAI_API_KEY)
 # -----------------------------------------------------------------------
 
 async def demo_live_chat():
     """
     Live demo: 3-turn conversation with CHRO.
-    Only runs if ANTHROPIC_API_KEY is set.
+    Only runs if OPENAI_API_KEY is set.
     """
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("⚠️  Skipping live demo — set ANTHROPIC_API_KEY to run")
+    if not os.environ.get("OPENAI_API_KEY"):
+        print("Skipping live demo — set OPENAI_API_KEY to run")
         return
 
     from agents.npc_agent import NPCAgent

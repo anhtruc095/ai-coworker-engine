@@ -28,7 +28,7 @@ Orchestration Layer
         │
         ▼
 Infrastructure
-  ├── LLM API  (Claude Sonnet)
+  ├── LLM API  (OpenAI)
   ├── FAISS    (vector store for RAG)
   └── Redis    (session state cache)
 ```
@@ -49,7 +49,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY
+# Edit .env and add your OPENAI_API_KEY
 ```
 
 ### 3. Run unit tests (no API key needed)
@@ -86,8 +86,8 @@ curl -X POST http://localhost:8000/chat \
 ### Why FAISS over Pinecone?
 FAISS runs locally with zero cost — ideal for a prototype. Pinecone adds managed infrastructure but isn't needed until scale requires it.
 
-### Why Claude Sonnet?
-Strong instruction-following means persona constraints hold reliably. Haiku is used for cheap internal calls (Supervisor progress checks).
+### Why OpenAI?
+Strong instruction-following keeps persona constraints reliable, while a lightweight default model keeps the prototype fast and inexpensive to run.
 
 ### Latency strategy
 Three-tier response: cache hit (< 200ms) → fast path (< 1.5s) → full RAG (2–4s). Most turns hit tier 1 or 2.
